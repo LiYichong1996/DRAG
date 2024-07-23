@@ -1,13 +1,13 @@
 MAX_EPISODE=1000
 MAX_ROUND=1
 LOCAL_DIR=$(cd $(dirname $0); pwd)
-echo "Local ${LOCAL_DIR}"
+# echo "Local ${LOCAL_DIR}"
 DATA_DIR="${LOCAL_DIR}/data/eterna_v2/"
-echo "Puzzles at ${DATA_DIR}"
+# echo "Puzzles at ${DATA_DIR}"
 LOG_DIR_ROOT="${LOCAL_DIR}/Design_Log/"
-echo "Log at ${LOG_DIR_ROOT}"
+# echo "Log at ${LOG_DIR_ROOT}"
 LOAD_MODEL_DIR="${LOCAL_DIR}/model_param/4_47/"
-echo "Model parameters at ${LOAD_MODEL_DIR}"
+# echo "Model parameters at ${LOAD_MODEL_DIR}"
 PLAY_BATCH_SIZE=100
 STEP=100
 N_TRAJ=0
@@ -19,6 +19,12 @@ GPU=2
 RWNEW_FRE=4
 RNAfold_Version=2
 
+echo "Enter the target strcucture:"
+read dotB
+echo "Your target structure: $input"
+
+echo "Enter the version of RNAfold(1 or 2):"
+read RNAfold_Version
 
 time_now=`date +%Y_%m_%d_%H_%M_%S`
 epi=0
