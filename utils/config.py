@@ -7,7 +7,7 @@ device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 num_change_pair = 4
 num_change_single = 4
 
-n_gnn = 4
+n_gnn = 5
 h_s_list = [64 for _ in range(n_gnn-1)]
 
 # backbone的参数

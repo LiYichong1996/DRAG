@@ -1,18 +1,9 @@
 import psutil
 
 
-def load_dotB(dotB_root, best_dir, id_list, load_best):
-    dotB_list = []
+def load_init_seq(best_dir, id_list, load_best):
     init_seq_list = []
     for rna_id in id_list:
-        dotB_dir = dotB_root + '/' + rna_id + '.rna'
-        f = open(dotB_dir)
-        iter_f = iter(f)
-        line = list(iter_f)[-1]
-        dotB = line.replace('\n', '')
-        dotB_list.append(dotB)
-        f.close()
-
         init_seq = None
         if load_best:
             # print('Load solutions.')
@@ -25,7 +16,7 @@ def load_dotB(dotB_root, best_dir, id_list, load_best):
                 init_seq = line.replace('\n', '')
                 f.close()
         init_seq_list.append(init_seq)
-    return dotB_list, init_seq_list
+    return init_seq_list
 
 
 def dict2str(ori_dict, split_str=' '):
@@ -60,6 +51,27 @@ if __name__ == "__main__":
     get_distance_from_base, get_topology_distance, get_pair_ratio, get_real_graph, simplify_graph, \
     get_pair_index_from_graphs, get_single_index_from_graphs, location_convert_from_agent
     from RL_lib.environment import Transition
+
+    # argv = [
+    #     "--structure", "((......((......))......(((......((......))......((......))......)))......)).....",
+    #     "--best_dir", "/home/liyichong/DRAG/Design_Log/design_2024_07_23_21_43_55/best_design/",
+    #     "--done_dir", "/home/liyichong/DRAG/Design_Log/design_2024_07_23_21_43_55/done_log.csv",
+    #     "--agent_dir", "/home/liyichong/DRAG/model_param/1001_1/",
+    #     "--episode", "440",
+    #     "--step", "100",
+    #     "--gpu_order", "2",
+    #     "--n_traj", "0",
+    #     "--n_step", "0",
+    #     "--final_traj", "0",
+    #     "--final_step", "0",
+    #     "--use_task_pool",
+    #     "--slack_threshold", "20",
+    #     "--fold_version", "2",
+    #     "--use_freeze",
+    #     "--init_seed", "0"
+    # ]      
+
+    # sys.argv = ["your_script.py"] + argv
 
     parser = argparse.ArgumentParser()
     
@@ -128,12 +140,14 @@ if __name__ == "__main__":
 
     ########################### Create Environment ###########################
     n_gen = args.n_gen
-    id_list = list(range(len(n_gen)))
-    dotB_list, init_seq_list = load_dotB(args.dotB_dir, args.best_dir, id_list, args.load_best)
+    id_list = list(range(n_gen))
+    init_seq_list = load_init_seq(args.best_dir, id_list, args.load_best)
+    aim_dotB = args.structure
+    dotB_list = [aim_dotB for _ in range(n_gen)]
     
     init_list = [
-        [0, 4],
-        [1, 4],
+        [0, 3],
+        [1, 3],
         [0, 5],
         [1, 5],
         [2, 0],
@@ -151,12 +165,12 @@ if __name__ == "__main__":
 
     init_base_order = init_list[init_seed][0]
     init_pair_order = init_list[init_seed][1]
-    if args.load_best:
-        print("Load the best solution")
-    elif init_pair_order is not None:
-        print("Init sequence with base {} and pair {}.".format(init_base_order, init_base_order))
-    else:
-        print("Randomly init.")
+    # if args.load_best:
+    #     print("Load the best solution")
+    # elif init_pair_order is not None:
+    #     print("Init sequence with base {} and pair {}.".format(init_base_order, init_base_order))
+    # else:
+    #     print("Randomly init.")
         
     
     edge_threshold = 0.001
@@ -177,7 +191,7 @@ if __name__ == "__main__":
 
     use_freeze = args.use_freeze
     # embeding
-    dict_dit = "../embedding/7MerVectors_2.txt"
+    dict_dit = "./embedding/7MerVectors_2.txt"
     mer = 7
 
     use_mp = args.use_mp
@@ -282,9 +296,11 @@ if __name__ == "__main__":
                     distance))
             done_f.write('\n')
             done_f.flush()
+            print("Solution: {}".format(sequence))
+        is_termial = True
 
     if len(env_m.RNA_list) == 0:
-        print("All done!")
+        # print("All done!")
         pass
 
     else:
@@ -340,6 +356,8 @@ if __name__ == "__main__":
                                 distance))
                         done_f.write('\n')
                         done_f.flush()
+                        print("Solution: {}".format(sequence))
+                    is_termial = True
 
                 if final_step:
                     final_id_list, final_dotB_list, \
@@ -374,7 +392,12 @@ if __name__ == "__main__":
                 state_ = torch_geometric.data.Batch.from_data_list(state)
                 memo_result = psutil.virtual_memory()
                 pbar.set_postfix({'used':memo_result.used, 'total': memo_result.total, 'ratio': memo_result.used/memo_result.total})
-                pbar.update(1) 
+                pbar.update(1)
+
+    if is_termial:
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
     ########################### Train ###########################
 
