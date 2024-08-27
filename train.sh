@@ -1,7 +1,7 @@
 MAX_EPISODE=1000
 LOCAL_DIR=$(cd $(dirname $0); pwd)
 echo "Local ${LOCAL_DIR}"
-DATA_DIR="${LOCAL_DIR}/data/eterna_v2/"
+DATA_DIR="${LOCAL_DIR}/data/raw/rfam_learn/train/"
 LOG_DIR_ROOT="/amax/data/liyichong/RNA_Split_2_data/"
 PLAY_BATCH_SIZE=100
 N_BUFFER_LOAD=10
@@ -61,10 +61,10 @@ do
         done_dir_f="${done_dir}_${epi}.csv"
         touch ${done_dir_f}
         echo "Maintain sloved puzzles."
-        python ./utils/get_ids.py --done_dir ${done_dir_f} --n_rna ${n_rna} --batch_size ${PLAY_BATCH_SIZE} --save_dir ${id_batch_dir} --forbid_id 22 --maintain_solved --set_init_ids
+        python ./utils/get_ids.py --done_dir ${done_dir_f} --n_rna ${n_rna} --batch_size ${PLAY_BATCH_SIZE} --save_dir ${id_batch_dir} --maintain_solved --set_init_ids
     else
         echo "Remove solved puzzles."
-        python ./utils/get_ids.py --done_dir ${done_dir_f} --n_rna ${n_rna} --batch_size ${PLAY_BATCH_SIZE} --save_dir ${id_batch_dir} --forbid_id 22 --set_init_ids
+        python ./utils/get_ids.py --done_dir ${done_dir_f} --n_rna ${n_rna} --batch_size ${PLAY_BATCH_SIZE} --save_dir ${id_batch_dir} --set_init_ids
     fi
 
     for id_batch_str in `cat ${id_batch_dir}`
